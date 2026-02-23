@@ -1,0 +1,121 @@
+✅ Project 1: Auto Water Dispenser
+Components:
+
+1 Ultrasonic Sensor (HC-SR04)
+
+1 Relay Module (to control Air Pump)
+
+1 Air Pump
+
+✅ Project 2: Auto Opening Dustbin
+Components:
+
+1 Ultrasonic Sensor (HC-SR04)
+
+1 Servo Motor (e.g., SG90)
+
+🔌 Wiring Connections
+🟦 Ultrasonic Sensor for Water Dispenser
+Ultrasonic Pin	Arduino Pin
+VCC	5V
+GND	GND
+TRIG	2
+ECHO	3
+🟩 Relay Module for Air Pump
+Relay Pin	Arduino Pin
+IN	4
+VCC	5V
+GND	GND
+🟦 Ultrasonic Sensor for Dustbin
+Ultrasonic Pin	Arduino Pin
+VCC	5V
+GND	GND
+TRIG	6
+ECHO	7
+🟨 Servo Motor
+Servo Pin	Arduino Pin
+Signal	9
+VCC	5V
+GND	GND
+✅ Arduino Code for Both Projects
+cpp
+Copy
+Edit
+#include <Servo.h>
+
+#define DISP_TRIG 2
+#define DISP_ECHO 3
+#define RELAY_PIN 4
+
+#define BIN_TRIG 6
+#define BIN_ECHO 7
+#define SERVO_PIN 9
+
+Servo binServo;
+
+void setup() {
+  pinMode(DISP_TRIG, OUTPUT);
+  pinMode(DISP_ECHO, INPUT);
+  pinMode(RELAY_PIN, OUTPUT);
+
+  pinMode(BIN_TRIG, OUTPUT);
+  pinMode(BIN_ECHO, INPUT);
+
+  binServo.attach(SERVO_PIN);
+  binServo.write(0); // Dustbin closed
+  digitalWrite(RELAY_PIN, LOW); // Pump OFF
+
+  Serial.begin(9600);
+}
+
+void loop() {
+  // --- Water Dispenser ---
+  long dist1 = getDistance(DISP_TRIG, DISP_ECHO);
+  if (dist1 < 10) {
+    digitalWrite(RELAY_PIN, HIGH); // Turn ON Pump
+    Serial.println("Water Dispensing...");
+    delay(3000); // Dispense time
+    digitalWrite(RELAY_PIN, LOW); // Turn OFF Pump
+  }
+
+  // --- Auto Dustbin ---
+  long dist2 = getDistance(BIN_TRIG, BIN_ECHO);
+  if (dist2 < 15) {
+    binServo.write(90); // Open bin
+    Serial.println("Bin Opened");
+    delay(3000);
+    binServo.write(0); // Close bin
+    Serial.println("Bin Closed");
+  }
+
+  delay(500);
+}
+
+// Function to get distance from ultrasonic sensor
+long getDistance(int trigPin, int echoPin) {
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+
+  long duration = pulseIn(echoPin, HIGH);
+  long distance = duration * 0.034 / 2;
+  return distance;
+}
+✅ Tips:
+Power the servo and pump separately using external 5V (through relay for the pump).
+
+Use common GND for Arduino and external power.
+
+Adjust delay and distance thresholds as needed.
+
+Let me know if you want a diagram or Fritzing layout for both setups!
+
+
+
+
+
+
+
+
